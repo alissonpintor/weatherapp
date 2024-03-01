@@ -1,11 +1,27 @@
-from typing import Any, List
 import flet as ft
+import requests
+
+
+# http://dataservice.accuweather.com/locations/v1/cities/autocomplete?apikey=yvSpjAIC63tntGY3qqHlIAHwGXXAEYUN&language=pt-br&q=Cuiabá
+APIKEY: str = 'yvSpjAIC63tntGY3qqHlIAHwGXXAEYUN'
+LANG: str = 'pt-br'
+URL = 'http://dataservice.accuweather.com/forecasts/v1/daily/1day'
 
 
 class WeatherView(ft.UserControl):
-    def __init__(self):
+    def __init__(self, location_id):
         super().__init__()
-    
+        self._location_id = location_id
+
+    def _get_location(self):
+        r = requests.get(f'{URL}/{self._location_id}/?apikey={APIKEY}&language={LANG}', timeout=500)
+        if r.status_code == 200:
+            return r.json()
+        return None
+
+    def _set_data_city(self):
+        data = self._get_location()
+  
     def _location(self):
         city = 'Várzea Grande'
         state = 'Mato Grosso'
@@ -50,9 +66,15 @@ class WeatherView(ft.UserControl):
             font_family='RobotoBold'
         )
 
+        image = ft.Image(
+            src='https://www.accuweather.com/images/weathericons/35.svg',
+            width=50
+        )
+
         temp_row = ft.Row(
             controls=[
-                temp
+                temp,
+                image
             ],
             alignment=ft.MainAxisAlignment.CENTER
         )
@@ -62,6 +84,8 @@ class WeatherView(ft.UserControl):
     def build(self):
         location = self._location()
         temp = self._temperature()
+
+        city = self._get_location()
         
         main_column = ft.Column(
             controls=[

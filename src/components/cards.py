@@ -3,9 +3,10 @@ import flet as ft
 
 class CityCard(ft.UserControl):
 
-    def __init__(self, city_id: int, city: str, state: str, country: str):
+    def __init__(self, page: ft.Page, city_id: int, city: str, state: str, country: str):
         super().__init__()
 
+        self._page = page
         self._city_id: int = city_id
         self._city: str = city
         self._state: str = state
@@ -35,7 +36,7 @@ class CityCard(ft.UserControl):
         )
 
         item_state_country_name = ft.Text(
-            f'{self._country.capitalize()}, {self._state.capitalize()}',
+            f'{self._city_id}, {self._country.capitalize()}, {self._state.capitalize()}',
             color=ft.colors.PURPLE_100,
             size=12,
             font_family='Roboto',
@@ -68,7 +69,8 @@ class CityCard(ft.UserControl):
             border_radius=25,
             gradient=ft.LinearGradient(
                 colors=[ft.colors.PURPLE, ft.colors.PINK]
-            )
+            ),
+            on_click=lambda _: self._page.go(f'/weather/{self._city_id}')
         )
 
         item_row = ft.Row(

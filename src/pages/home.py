@@ -11,12 +11,14 @@ URL = 'http://dataservice.accuweather.com/locations/v1/cities/autocomplete'
 
 
 class HomeView(ft.UserControl):
-    def __init__(self):
+    def __init__(self, page: ft.Page):
         super().__init__()
         self._item_list = ft.ListView(
             spacing=10,
             expand=True
         )
+
+        self._page = page
 
     def _search_cities(self, search):
         r: requests.Request = requests.get(f'{URL}/?apikey={APIKEY}&language={LANG}&q={search}', timeout=500)
@@ -51,7 +53,7 @@ class HomeView(ft.UserControl):
                 state_name = city['AdministrativeArea']['LocalizedName']
                 country_name = city['Country']['LocalizedName']
 
-                item = CityCard(city_id, city_name, state_name, country_name)
+                item = CityCard(self._page, city_id, city_name, state_name, country_name)
                 self._item_list.controls.append(item)
             self._item_list.update()
         else:
